@@ -1,6 +1,6 @@
 import React from "react";
 import { Box } from "@material-ui/core";
-import { BadgeAvatar, ChatContent } from "../Sidebar";
+import { BadgeAvatar, ChatContent, NewMessAlert } from "../Sidebar";
 import { makeStyles } from "@material-ui/core/styles";
 import { setActiveChat } from "../../store/activeConversation";
 import { connect } from "react-redux";
@@ -14,9 +14,9 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     "&:hover": {
-      cursor: "grab"
-    }
-  }
+      cursor: "grab",
+    },
+  },
 }));
 
 const Chat = (props) => {
@@ -28,6 +28,8 @@ const Chat = (props) => {
     await props.setActiveChat(conversation.otherUser.username);
   };
 
+  const hasNewMessage = () => conversation.newMessageCount > 0;
+
   return (
     <Box onClick={() => handleClick(conversation)} className={classes.root}>
       <BadgeAvatar
@@ -37,6 +39,7 @@ const Chat = (props) => {
         sidebar={true}
       />
       <ChatContent conversation={conversation} />
+      {hasNewMessage ?? <NewMessAlert missMessage={conversation.missMessage} />}
     </Box>
   );
 };
@@ -45,7 +48,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     setActiveChat: (id) => {
       dispatch(setActiveChat(id));
-    }
+    },
   };
 };
 
