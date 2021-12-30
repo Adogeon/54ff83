@@ -96,7 +96,6 @@ export const sendReadReceipt =
   (messageId, messageIndex) => async (dispatch) => {
     try {
       const { data } = await axios.put(`/api/messages/read/${messageId}`);
-      console.log(data);
       dispatch(markMessageReadInStore(messageIndex, data.convoId));
     } catch (error) {
       console.log(error);
