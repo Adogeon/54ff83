@@ -10,8 +10,10 @@ const useStyles = makeStyles((theme) => ({
     alignContent: "center",
   },
   amount: {
-    borderRadius: "100%",
-    backgroundColor: "#BECCE2",
+    borderRadius: "10px",
+    backgroundColor: "#3F92FF",
+    fontSize: "10px",
+    padding: "3px 7px",
     color: "#FFFFFF",
   },
 }));
