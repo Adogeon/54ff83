@@ -71,9 +71,25 @@ router.get("/", async (req, res, next) => {
       convoJSON.messages.reverse();
       // set properties for notification count and latest message preview
       convoJSON.latestMessageText = convoJSON.messages.at(-1).text;
+      //set Message is read according to each userId,
+      convoJSON.messages.forEach((message) => {
+        message.isRead = message.readReceipt.includes(userId);
+        delete message.readReceipt;
+      });
       conversations[i] = convoJSON;
     }
     res.json(conversations);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// mark a conversation as active so we can set
+router.post("/active", (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
   } catch (error) {
     next(error);
   }

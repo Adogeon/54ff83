@@ -5,6 +5,7 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  markMessageReadInStore,
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -90,6 +91,17 @@ const sendMessage = (data, body) => {
     sender: data.sender,
   });
 };
+
+export const sendReadReceipt =
+  (messageId, messageIndex) => async (dispatch) => {
+    try {
+      const { data } = await axios.put(`/api/messages/read/${messageId}`);
+      console.log(data);
+      dispatch(markMessageReadInStore(messageIndex, data.convoId));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
 // message format to send: {recipientId, text, conversationId}
 // conversationId will be set to null if its a brand new conversation
