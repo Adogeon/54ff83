@@ -81,12 +81,15 @@ export const addNewConvoToStore = (state, recipientId, message) => {
   });
 };
 
-export const updateMessageReadInStore = (state, messageIndex, convoId) => {
+export const updateMessageReadInStore = (state, convoId) => {
   return state.map((convo) => {
     if (convo.id === convoId) {
       const updateMessages = convo.messages.map((message) => {
         if (!message.isRead) {
           message.isRead = true;
+          return message;
+        } else {
+          return message;
         }
       });
 
