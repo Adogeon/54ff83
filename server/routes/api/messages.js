@@ -36,12 +36,10 @@ router.post("/", async (req, res, next) => {
       senderId,
       text,
       conversationId: conversation.id,
+      isRead: false,
     });
 
-    //set message.isRead to false;
     const messageJSON = message.toJSON();
-    messageJSON.isRead = false;
-    delete messageJSON.readReceipt;
 
     res.json({ message: messageJSON, sender });
   } catch (error) {

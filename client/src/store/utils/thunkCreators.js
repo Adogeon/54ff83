@@ -7,6 +7,7 @@ import {
   setSearchedUsers,
   markMessageReadInStore,
 } from "../conversations";
+import { setActiveChatInStore } from "../activeConversation";
 import { gotUser, setFetchingStatus } from "../user";
 
 axios.interceptors.request.use(async function (config) {
@@ -92,15 +93,14 @@ const sendMessage = (data, body) => {
   });
 };
 
-export const sendReadReceipt =
-  (messageId, messageIndex) => async (dispatch) => {
-    try {
-      const { data } = await axios.put(`/api/messages/read/${messageId}`);
-      dispatch(markMessageReadInStore(messageIndex, data.convoId));
-    } catch (error) {
-      console.log(error);
-    }
-  };
+export const setActiveChat = (conversation) => async (dispatch) => {
+  try {
+    await axios.put(`/api/active/${conversation.id}`);
+    dispatch(setActiveChatInStore(conversation.otherUser.username));
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 // message format to send: {recipientId, text, conversationId}
 // conversationId will be set to null if its a brand new conversation
