@@ -95,6 +95,7 @@ export const updateMessageReadInStore = (state, convoId) => {
 
       return {
         ...convo,
+        newMessageCount: 0,
         message: updateMessages,
       };
     } else {
