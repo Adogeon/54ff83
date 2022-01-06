@@ -38,37 +38,8 @@ router.post("/", async (req, res, next) => {
       conversationId: conversation.id,
     });
 
-    //set message.isRead to false;
-    const messageJSON = message.toJSON();
-    messageJSON.isRead = false;
-    delete messageJSON.readReceipt;
-
-    res.json({ message: messageJSON, sender });
+    res.json({ message, sender });
   } catch (error) {
-    next(error);
-  }
-});
-
-router.put("/read/:messageId", async (req, res, next) => {
-  try {
-    if (!req.user) {
-      return res.sendStatus(401);
-    }
-    const readerId = req.user.id;
-    const messageId = req.params.messageId;
-
-    const message = await Message.findByPk(messageId);
-    if (!message.readReceipt.includes(readerId)) {
-      message.readReceipt = [...message.readReceipt, readerId];
-      message.save();
-    }
-
-    res.json({
-      convoId: message.conversationId,
-      messageId: message.id,
-    });
-  } catch (error) {
-    console.log(error);
     next(error);
   }
 });

@@ -71,11 +71,10 @@ router.get("/", async (req, res, next) => {
       convoJSON.messages.reverse();
       // set properties for notification count and latest message preview
       convoJSON.latestMessageText = convoJSON.messages.at(-1).text;
-      //set Message is read according to each userId,
-      convoJSON.messages.forEach((message) => {
-        message.isRead = message.readReceipt.includes(userId);
-        delete message.readReceipt;
-      });
+      convoJSON.newMessageCount = convoJSON.messages.filter(
+        (message) => !message.isRead && message.senderId !== userId
+      ).length;
+
       conversations[i] = convoJSON;
     }
     res.json(conversations);
@@ -85,11 +84,35 @@ router.get("/", async (req, res, next) => {
 });
 
 // mark a conversation as active so we can set
-router.post("/active", (req, res, next) => {
+router.put("/active/:convoId", async (req, res, next) => {
   try {
     if (!req.user) {
       return res.sendStatus(401);
     }
+    const convoId = req.params.convoId;
+    const userId = req.user.id;
+    const convo = await Conversation.findByPk(convoId, {
+      include: [
+        {
+          model: Message,
+          attributes: ["id", "senderId", "isRead"],
+        },
+      ],
+    });
+    const convoJSON = convo.toJSON();
+    //check if user is part of the conversation
+    if (userId !== convoJSON.user1Id && userId !== convoJSON.user2Id) {
+      return res
+        .status(401)
+        .json({ error: "User is not part of the conversation" });
+    }
+
+    const newMessageIds = convoJSON.messages
+      .filter((message) => !message.isRead && message.senderId !== userId)
+      .map((message) => message.id);
+
+    await Message.update({ isRead: true }, { where: { id: newMessageIds } });
+    return res.status(200).json({ userId, readMessageIds: newMessageIds });
   } catch (error) {
     next(error);
   }
