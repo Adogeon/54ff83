@@ -17,6 +17,10 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 12,
     color: "#9CADC8",
     letterSpacing: -0.17,
+    "&.new": {
+      fontWeight: "bold",
+      color: "inherit",
+    },
   },
   badge: {
     "& .MuiBadge-anchorOriginTopRightRectangle": {
@@ -41,7 +45,11 @@ const ChatContent = (props) => {
         <Typography className={classes.username}>
           {otherUser.username}
         </Typography>
-        <Typography className={classes.previewText}>
+        <Typography
+          className={`${classes.previewText} ${
+            newMessageCount > 0 ? "new" : ""
+          }`}
+        >
           {latestMessageText}
         </Typography>
       </Box>

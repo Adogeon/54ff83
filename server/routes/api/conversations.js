@@ -72,7 +72,7 @@ router.get("/", async (req, res, next) => {
       // set properties for notification count and latest message preview
       convoJSON.latestMessageText = convoJSON.messages.at(-1).text;
       convoJSON.newMessageCount = convoJSON.messages.filter(
-        (message) => !message.isRead
+        (message) => !message.isRead && message.senderId !== userId
       ).length;
 
       conversations[i] = convoJSON;
@@ -109,7 +109,7 @@ router.put("/active/:convoId", async (req, res, next) => {
     }
 
     const newMessageIds = convoJSON.messages
-      .filter((message) => !message.isRead)
+      .filter((message) => !message.isRead && message.senderId !== userId)
       .map((message) => message.id);
 
     const result = await Message.update(
