@@ -8,7 +8,7 @@ const Messages = (props) => {
   const lastMessageRead =
     messages
       .filter((message) => message.isRead && message.senderId === userId)
-      .at(-1)?.id ?? "";
+      .slice(-1)[0]?.id ?? "";
   return (
     <Box>
       {messages.map((message, index) => {
