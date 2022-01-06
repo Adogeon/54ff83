@@ -90,13 +90,12 @@ router.put("/active/:convoId", async (req, res, next) => {
       return res.sendStatus(401);
     }
     const convoId = req.params.convoId;
-
     const userId = req.user.id;
     const convo = await Conversation.findByPk(convoId, {
       include: [
         {
           model: Message,
-          attributes: ["id", "isRead"],
+          attributes: ["id", "senderId", "isRead"],
         },
       ],
     });
@@ -112,11 +111,8 @@ router.put("/active/:convoId", async (req, res, next) => {
       .filter((message) => !message.isRead && message.senderId !== userId)
       .map((message) => message.id);
 
-    const result = await Message.update(
-      { isRead: true },
-      { where: { id: newMessageIds } }
-    );
-    return res.sendStatus(200);
+    await Message.update({ isRead: true }, { where: { id: newMessageIds } });
+    return res.status(200).json({ userId, readMessageIds: newMessageIds });
   } catch (error) {
     next(error);
   }

@@ -95,8 +95,10 @@ const sendMessage = (data, body) => {
 
 export const setActiveChat = (conversation) => async (dispatch) => {
   try {
-    await axios.put(`/api/conversations/active/${conversation.id}`);
-    dispatch(markMessageReadInStore(conversation.id));
+    const { data } = await axios.put(
+      `/api/conversations/active/${conversation.id}`
+    );
+    dispatch(markMessageReadInStore(data.userId, conversation.id));
     dispatch(setActiveChatInStore(conversation.otherUser.username));
   } catch (error) {
     console.error(error);

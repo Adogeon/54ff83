@@ -68,10 +68,10 @@ export const addConversation = (recipientId, newMessage) => {
   };
 };
 
-export const markMessageReadInStore = (convoId) => {
+export const markMessageReadInStore = (userId, convoId) => {
   return {
     type: MESSAGE_READ,
-    payload: { convoId },
+    payload: { userId, convoId },
   };
 };
 
@@ -100,7 +100,11 @@ const reducer = (state = [], action) => {
         action.payload.newMessage
       );
     case MESSAGE_READ:
-      return updateMessageReadInStore(state, action.payload.convoId);
+      return updateMessageReadInStore(
+        state,
+        action.payload.userId,
+        action.payload.convoId
+      );
     default:
       return state;
   }
