@@ -11,12 +11,10 @@ router.get("/", async (req, res, next) => {
       return res.sendStatus(401);
     }
     const userId = req.user.id;
+
     const conversations = await Conversation.findAll({
       where: {
-        [Op.or]: {
-          user1Id: userId,
-          user2Id: userId,
-        },
+        "$member.id": userId,
       },
       attributes: ["id"],
       order: [[Message, "createdAt", "DESC"]],
@@ -24,25 +22,8 @@ router.get("/", async (req, res, next) => {
         { model: Message, order: ["createdAt", "DESC"] },
         {
           model: User,
-          as: "user1",
-          where: {
-            id: {
-              [Op.not]: userId,
-            },
-          },
+          as: "member",
           attributes: ["id", "username", "photoUrl"],
-          required: false,
-        },
-        {
-          model: User,
-          as: "user2",
-          where: {
-            id: {
-              [Op.not]: userId,
-            },
-          },
-          attributes: ["id", "username", "photoUrl"],
-          required: false,
         },
       ],
     });
@@ -51,21 +32,19 @@ router.get("/", async (req, res, next) => {
       const convo = conversations[i];
       const convoJSON = convo.toJSON();
 
-      // set a property "otherUser" so that frontend will have easier access
-      if (convoJSON.user1) {
-        convoJSON.otherUser = convoJSON.user1;
-        delete convoJSON.user1;
-      } else if (convoJSON.user2) {
-        convoJSON.otherUser = convoJSON.user2;
-        delete convoJSON.user2;
-      }
+      // set a property "otherUsers" so that frontend will have easier access
+      convoJSON.otherUsers = convoJSON.members.filter(
+        (member) => member.id !== userId
+      );
 
-      // set property for online status of the other user
-      if (onlineUsers.includes(convoJSON.otherUser.id)) {
-        convoJSON.otherUser.online = true;
-      } else {
-        convoJSON.otherUser.online = false;
-      }
+      // set property for online status of the other users
+      convoJSON.otherUsers.forEach((user) => {
+        if (onlineUsers.include(user.id)) {
+          user.online = true;
+        } else {
+          user.online = false;
+        }
+      });
 
       //reverse the consJSON messages array to ensure the message is display in correct order
       convoJSON.messages.reverse();
