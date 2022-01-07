@@ -109,9 +109,7 @@ router.put("/active/:convoId", async (req, res, next) => {
     const convoJSON = convo.toJSON();
     //check if user is part of the conversation
     if (userId !== convoJSON.user1Id && userId !== convoJSON.user2Id) {
-      return res
-        .status(401)
-        .json({ error: "User is not part of the conversation" });
+      return res.sendStatus(403);
     }
 
     const newMessageIds = convoJSON.messages
