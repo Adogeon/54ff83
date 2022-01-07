@@ -3,12 +3,13 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Box } from "@material-ui/core";
 import { Input, Header, Messages } from "./index";
 import { connect } from "react-redux";
+import { sendReadReceipts } from "../../store/utils/thunkCreators";
 
 const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
     flexGrow: 8,
-    flexDirection: "column"
+    flexDirection: "column",
   },
   chatContainer: {
     marginLeft: 41,
@@ -16,14 +17,18 @@ const useStyles = makeStyles(() => ({
     display: "flex",
     flexDirection: "column",
     flexGrow: 1,
-    justifyContent: "space-between"
-  }
+    justifyContent: "space-between",
+  },
 }));
 
 const ActiveChat = (props) => {
   const classes = useStyles();
-  const { user } = props;
+  const { user, sendReadReceipts } = props;
   const conversation = props.conversation || {};
+
+  if (conversation.newMessageCount > 0) {
+    sendReadReceipts(conversation);
+  }
 
   return (
     <Box className={classes.root}>
@@ -38,6 +43,7 @@ const ActiveChat = (props) => {
               messages={conversation.messages}
               otherUser={conversation.otherUser}
               userId={user.id}
+              lastMessageReadId={conversation.lastMessageReadId}
             />
             <Input
               otherUser={conversation.otherUser}
@@ -57,9 +63,17 @@ const mapStateToProps = (state) => {
     conversation:
       state.conversations &&
       state.conversations.find(
-        (conversation) => conversation.otherUser.username === state.activeConversation
-      )
+        (conversation) =>
+          conversation.otherUser.username === state.activeConversation
+      ),
   };
 };
 
-export default connect(mapStateToProps, null)(ActiveChat);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    sendReadReceipts: (conversation) =>
+      dispatch(sendReadReceipts(conversation)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ActiveChat);
