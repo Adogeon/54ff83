@@ -101,7 +101,7 @@ const sendUpdateLastReadMsg = (convoId, messageId, senderId) => {
   });
 };
 
-export const setActiveChat = (conversation) => async (dispatch) => {
+export const sendReadReceipts = (conversation) => async (dispatch) => {
   try {
     if (conversation.id) {
       const { data } = await axios.put(
@@ -115,10 +115,14 @@ export const setActiveChat = (conversation) => async (dispatch) => {
         sendUpdateLastReadMsg(conversation.id, lastMessageReadId, data.userId);
       }
     }
-    dispatch(setActiveChatInStore(conversation.otherUser.username));
   } catch (error) {
     console.error(error);
   }
+};
+
+export const setActiveChat = (conversation) => async (dispatch) => {
+  dispatch(sendReadReceipts(conversation));
+  dispatch(setActiveChatInStore(conversation.otherUser.username));
 };
 
 // message format to send: {recipientId, text, conversationId}
