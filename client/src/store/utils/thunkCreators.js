@@ -93,6 +93,14 @@ const sendMessage = (data, body) => {
   });
 };
 
+const sendUpdateLastReadMsg = (convoId, messageId, senderId) => {
+  socket.emit("last-read-receipt", {
+    convoId,
+    messageId,
+    senderId,
+  });
+};
+
 export const setActiveChat = (conversation) => async (dispatch) => {
   try {
     if (conversation.id) {
@@ -100,6 +108,12 @@ export const setActiveChat = (conversation) => async (dispatch) => {
         `/api/conversations/active/${conversation.id}`
       );
       dispatch(markMessageReadInStore(data.userId, conversation.id));
+
+      if (data.readMessageIds.length > 0) {
+        const lastMessageReadId =
+          data.readMessageIds[data.readMessageIds.length - 1];
+        sendUpdateLastReadMsg(conversation.id, lastMessageReadId, data.userId);
+      }
     }
     dispatch(setActiveChatInStore(conversation.otherUser.username));
   } catch (error) {

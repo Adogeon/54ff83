@@ -57,7 +57,7 @@ const ChatContent = (props) => {
         className={classes.badge}
         badgeContent={newMessageCount}
         color="primary"
-      ></Badge>
+      />
     </Box>
   );
 };
